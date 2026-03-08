@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateStats();
 
     document.getElementById('btn-clear').addEventListener('click', () => {
-        if (confirm('Вы уверены, что хотите удалить всю историю просмотренных объявлений?')) {
+        if (confirm('Are you sure you want to delete all seen listings history?')) {
             chrome.storage.local.clear(() => {
                 updateStats();
             });
@@ -59,7 +59,7 @@ function updateStats() {
 function renderFavorites(favs) {
     const list = document.getElementById('favorites-list');
     if (favs.length === 0) {
-        list.innerHTML = '<div class="empty-state">Пока ничего не добавлено</div>';
+        list.innerHTML = '<div class="empty-state">Nothing added yet</div>';
         return;
     }
 
@@ -79,7 +79,7 @@ function renderFavorites(favs) {
 
 function exportToCSV() {
     if (currentFavorites.length === 0) {
-        alert('У вас нет избранных объявлений для экспорта.');
+        alert('You have no favorites to export.');
         return;
     }
 
@@ -109,11 +109,11 @@ function exportToCSV() {
 
 function exportToMarkdown() {
     if (currentFavorites.length === 0) {
-        alert('У вас нет избранных объявлений для экспорта.');
+        alert('You have no favorites to export.');
         return;
     }
 
-    let mdContent = '# Избранные объявления SeenIt\n\n';
+    let mdContent = '# SeenIt Favorites\n\n';
 
     // Group by priority
     const grouped = {
@@ -128,10 +128,10 @@ function exportToMarkdown() {
 
     for (const priority of ['P1', 'P2', 'P3']) {
         if (grouped[priority].length > 0) {
-            mdContent += `## ${priority} Приоритет\n\n`;
+            mdContent += `## ${priority} Priority\n\n`;
             grouped[priority].forEach(f => {
                 const date = f.timestamp ? new Date(f.timestamp).toLocaleDateString() : 'N/A';
-                mdContent += `- [**${f.title}**](${f.url}) - *${f.domain}* (добавлено: ${date})\n`;
+                mdContent += `- [**${f.title}**](${f.url}) - *${f.domain}* (added: ${date})\n`;
             });
             mdContent += '\n';
         }
