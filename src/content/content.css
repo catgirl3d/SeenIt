@@ -1,0 +1,147 @@
+.seenit-ui-container {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+}
+
+.seenit-action-group {
+    display: flex;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 6px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(4px);
+    transition: opacity 0.2s;
+}
+
+.seenit-btn {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #475569;
+    transition: all 0.2s;
+}
+
+.seenit-btn:hover {
+    background: #f8fafc;
+}
+
+.seenit-btn-seen:hover {
+    color: #10b981;
+    border-color: #10b981;
+}
+
+.seenit-btn-reject:hover {
+    color: #ef4444;
+    border-color: #ef4444;
+}
+
+.seenit-badge-wrapper {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 6px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.seenit-badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.seenit-badge-seen {
+    background-color: #10b981;
+}
+
+.seenit-badge-rejected {
+    background-color: #ef4444;
+}
+
+.seenit-btn-fav:hover {
+    color: #f59e0b;
+    border-color: #f59e0b;
+}
+
+.seenit-priority-picker {
+    display: flex;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 4px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(8px);
+    animation: seenit-fade-in 0.2s ease-out;
+}
+
+@keyframes seenit-fade-in {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.seenit-p-btn {
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    background: white;
+    transition: all 0.2s;
+}
+
+.seenit-p-btn-p1 { color: #ef4444; border-color: #fee2e2; }
+.seenit-p-btn-p1:hover { background: #fee2e2; }
+
+.seenit-p-btn-p2 { color: #f59e0b; border-color: #fef3c7; }
+.seenit-p-btn-p2:hover { background: #fef3c7; }
+
+.seenit-p-btn-p3 { color: #3b82f6; border-color: #dbeafe; }
+.seenit-p-btn-p3:hover { background: #dbeafe; }
+
+.seenit-badge-fav {
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #92400e;
+}
+
+.seenit-badge-fav .star {
+    margin-right: 4px;
+}
+
+.seenit-badge-fav-p1 { background-color: #fee2e2; color: #b91c1c; border-color: #f87171; }
+.seenit-badge-fav-p2 { background-color: #fef3c7; color: #92400e; border-color: #fbbf24; }
+.seenit-badge-fav-p3 { background-color: #dbeafe; color: #1e40af; border-color: #60a5fa; }
+
+/* Card States */
+.listing-card.seenit-state-rejected {
+    opacity: 0.4;
+    transition: opacity 0.3s;
+}
+
+.listing-card.seenit-state-rejected:hover {
+    opacity: 0.8;
+}
+
+.listing-card.seenit-state-fav {
+    border: 2px solid #fbbf24 !important;
+    background-color: #fffbeb;
+}
+
+/* Subtle styling for seen items */
+.listing-card.seenit-state-seen {
+    background-color: #f8fafc;
+}
+.listing-card.seenit-state-seen img {
+    opacity: 0.85;
+}

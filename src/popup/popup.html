@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SeenIt Settings</title>
+    <link rel="stylesheet" href="popup.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #10b981;">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <h1>SeenIt</h1>
+            </div>
+        </header>
+        
+        <main>
+            <div class="stats-card">
+                <h2>Ваша статистика</h2>
+                <div class="stat-row">
+                    <span class="stat-label">Просмотрено:</span>
+                    <span class="stat-value" id="stats-seen">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Избранное:</span>
+                    <span class="stat-value" id="stats-favorites">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Не подходит:</span>
+                    <span class="stat-value" id="stats-rejected">-</span>
+                </div>
+            </div>
+
+            <div class="favorites-section">
+                <h2>⭐ Список избранного</h2>
+                <div id="favorites-list" class="favorites-list">
+                    <div class="empty-state">Пока ничего не добавлено</div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button id="btn-export" class="btn-primary">Экспортировать (CSV)</button>
+                <button id="btn-clear" class="btn-secondary">Очистить историю</button>
+            </div>
+        </main>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "SeenIt",
+  "version": "1.0",
+  "description": "Mark seen real estate listings on supported websites. Modern UI.",
+  "permissions": ["storage"],
+  "action": {
+    "default_popup": "src/popup/popup.html"
+  },
+  "background": {
+    "scripts": ["src/background.js"]
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "seenit@alina.local",
+      "strict_min_version": "109.0"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.immobilienscout24.de/*"],
+      "css": ["src/content/content.css"],
+      "js": [
+        "src/content/storage.js",
+        "src/content/ui-components.js",
+        "src/content/providers/provider-registry.js",
+        "src/content/providers/immobilienscout24.js",
+        "src/content/main.js"
+      ]
+    }
+  ]
+}
