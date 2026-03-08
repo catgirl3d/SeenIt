@@ -145,3 +145,43 @@
 .listing-card.seenit-state-seen img {
     opacity: 0.85;
 }
+
+/* Expose Page Top Bar */
+.seenit-expose-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 999999;
+}
+
+.seenit-expose-logo {
+    font-weight: 800;
+    color: #10b981;
+    font-size: 16px;
+    letter-spacing: -0.5px;
+}
+
+.seenit-expose-status {
+    min-width: 150px;
+    display: flex;
+    justify-content: center;
+}
+
+.seenit-picker-overlay {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    padding: 2px 8px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
