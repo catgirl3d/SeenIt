@@ -12,7 +12,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     document.getElementById('btn-export').addEventListener('click', () => {
-        exportToCSV();
+        const format = document.getElementById('export-format').value;
+        if (format === 'markdown') {
+            exportToMarkdown();
+        } else {
+            exportToCSV();
+        }
     });
 });
 
@@ -96,6 +101,48 @@ function exportToCSV() {
     const link = document.createElement('a');
     link.setAttribute('href', url);
     link.setAttribute('download', `SeenIt_Favorites_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function exportToMarkdown() {
+    if (currentFavorites.length === 0) {
+        alert('У вас нет избранных объявлений для экспорта.');
+        return;
+    }
+
+    let mdContent = '# Избранные объявления SeenIt\n\n';
+
+    // Group by priority
+    const grouped = {
+        'P1': [],
+        'P2': [],
+        'P3': []
+    };
+
+    currentFavorites.forEach(f => {
+        if (grouped[f.priority]) grouped[f.priority].push(f);
+    });
+
+    for (const priority of ['P1', 'P2', 'P3']) {
+        if (grouped[priority].length > 0) {
+            mdContent += `## ${priority} Приоритет\n\n`;
+            grouped[priority].forEach(f => {
+                const date = f.timestamp ? new Date(f.timestamp).toLocaleDateString() : 'N/A';
+                mdContent += `- [**${f.title}**](${f.url}) - *${f.domain}* (добавлено: ${date})\n`;
+            });
+            mdContent += '\n';
+        }
+    }
+
+    const blob = new Blob([mdContent], { type: 'text/markdown;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `SeenIt_Favorites_${new Date().toISOString().split('T')[0]}.md`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();

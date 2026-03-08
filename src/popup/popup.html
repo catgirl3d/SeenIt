@@ -43,7 +43,13 @@
             </div>
 
             <div class="actions">
-                <button id="btn-export" class="btn-primary">Экспортировать (CSV)</button>
+                <div class="export-group">
+                    <select id="export-format" class="export-select">
+                        <option value="csv">CSV</option>
+                        <option value="markdown">Markdown</option>
+                    </select>
+                    <button id="btn-export" class="btn-primary">Экспорт</button>
+                </div>
                 <button id="btn-clear" class="btn-secondary">Очистить историю</button>
             </div>
         </main>
