@@ -79,7 +79,7 @@ function renderFavorites(favs) {
 
 function exportToCSV() {
     if (currentFavorites.length === 0) {
-        alert('You have no favorites to export.');
+        showToast('You have no favorites to export.');
         return;
     }
 
@@ -109,7 +109,7 @@ function exportToCSV() {
 
 function exportToMarkdown() {
     if (currentFavorites.length === 0) {
-        alert('You have no favorites to export.');
+        showToast('You have no favorites to export.');
         return;
     }
 
@@ -147,4 +147,20 @@ function exportToMarkdown() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+}
+
+function showToast(message) {
+    let toast = document.querySelector('.seenit-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.className = 'seenit-toast';
+        document.body.appendChild(toast);
+    }
+    
+    toast.textContent = message;
+    toast.classList.add('visible');
+    
+    setTimeout(() => {
+        toast.classList.remove('visible');
+    }, 3000);
 }
