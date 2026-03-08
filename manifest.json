@@ -18,13 +18,18 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*.immobilienscout24.de/*"],
+      "matches": [
+        "*://*.immobilienscout24.de/*",
+        "*://*.immowelt.de/*"
+      ],
       "css": ["src/content/content.css"],
       "js": [
         "src/content/storage.js",
         "src/content/ui-components.js",
         "src/content/providers/provider-registry.js",
+        "src/content/providers/base-provider.js",
         "src/content/providers/immobilienscout24.js",
+        "src/content/providers/immowelt.js",
         "src/content/main.js"
       ]
     }
