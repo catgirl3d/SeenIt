@@ -19,6 +19,14 @@
         </header>
         
         <main>
+            <div class="favorite-list-controls">
+                <h2>Active Favorites List</h2>
+                <div class="favorite-list-row">
+                    <select id="favorite-list-select" class="export-select"></select>
+                    <button id="btn-add-list" class="btn-secondary">+ List</button>
+                </div>
+            </div>
+
             <div class="stats-card">
                 <h2>Your Statistics</h2>
                 <div class="stat-row">
@@ -36,7 +44,7 @@
             </div>
 
             <div class="favorites-section">
-                <h2>⭐ Favorites List</h2>
+                <h2 id="favorites-title">⭐ Favorites List</h2>
                 <div id="favorites-list" class="favorites-list">
                     <div class="empty-state">Nothing added yet</div>
                 </div>
@@ -50,10 +58,16 @@
                     </select>
                     <button id="btn-export" class="btn-primary">Export</button>
                 </div>
+                <div class="backup-group">
+                    <button id="btn-export-backup" class="btn-secondary">Export Backup</button>
+                    <button id="btn-import-backup" class="btn-secondary">Import Backup</button>
+                    <input id="backup-file-input" type="file" accept="application/json" hidden>
+                </div>
                 <button id="btn-clear" class="btn-secondary">Clear History</button>
             </div>
         </main>
     </div>
+    <script src="../content/storage.js"></script>
     <script src="popup.js"></script>
 </body>
 </html>

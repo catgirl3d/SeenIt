@@ -1,7 +1,14 @@
 let currentFavorites = [];
+const BACKUP_FORMAT_VERSION = 1;
 
 document.addEventListener('DOMContentLoaded', async () => {
-    updateStats();
+    await setupFavoriteListControls();
+    await updateStats();
+
+    chrome.storage.onChanged.addListener(async () => {
+        await setupFavoriteListControls();
+        await updateStats();
+    });
 
     document.getElementById('btn-clear').addEventListener('click', () => {
         if (confirm('Are you sure you want to delete all seen listings history?')) {
@@ -19,40 +26,133 @@ document.addEventListener('DOMContentLoaded', async () => {
             exportToCSV();
         }
     });
+
+    document.getElementById('btn-export-backup').addEventListener('click', exportBackup);
+
+    const backupFileInput = document.getElementById('backup-file-input');
+    document.getElementById('btn-import-backup').addEventListener('click', () => {
+        backupFileInput.click();
+    });
+
+    backupFileInput.addEventListener('change', async (event) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        await importBackup(file);
+        event.target.value = '';
+    });
 });
 
-function updateStats() {
+async function setupFavoriteListControls() {
+    const select = document.getElementById('favorite-list-select');
+    const lists = await StorageManager.getFavoriteLists();
+    const activeListId = await StorageManager.getActiveFavoriteListId();
+    const activeList = lists.find((list) => list.id === activeListId) || lists[0];
+
+    select.innerHTML = lists.map((list) => `<option value="${list.id}">${list.name}</option>`).join('');
+    select.value = activeList?.id || 'main';
+
+    const title = document.getElementById('favorites-title');
+    title.textContent = `⭐ Favorites: ${activeList?.name || 'Main'}`;
+
+    select.onchange = async (e) => {
+        await StorageManager.setActiveFavoriteListId(e.target.value);
+        await setupFavoriteListControls();
+        await updateStats();
+    };
+
+    const addBtn = document.getElementById('btn-add-list');
+    addBtn.onclick = async () => {
+        const name = prompt('New list name (max 30 chars):');
+        if (!name) return;
+
+        const newList = await StorageManager.addFavoriteList(name);
+        if (!newList) return;
+
+        await StorageManager.setActiveFavoriteListId(newList.id);
+        await setupFavoriteListControls();
+        await updateStats();
+    };
+}
+
+async function updateStats() {
+    const activeListId = await StorageManager.getActiveFavoriteListId();
+    const lists = await StorageManager.getFavoriteLists();
+    const listById = Object.fromEntries(lists.map((list) => [list.id, list.name]));
+
     chrome.storage.local.get(null, (items) => {
         let seen = 0;
         let rejected = 0;
-        let favorites = [];
+        const allFavorites = [];
 
-        for (const domain in items) {
-            const domainData = items[domain];
+        for (const key in items) {
+            if (
+                key === StorageManager.SETTINGS_KEY ||
+                key === StorageManager.LOCAL_ACTIVE_LIST_KEY ||
+                key.startsWith(StorageManager.FAVORITE_KEY_PREFIX)
+            ) {
+                continue;
+            }
+
+            const domainData = items[key];
+            if (!domainData || typeof domainData !== 'object' || Array.isArray(domainData)) continue;
+
             for (const id in domainData) {
-                const item = domainData[id];
-                const status = typeof item === 'string' ? item : item.status;
-                
-                if (status === 'seen') seen++;
-                else if (status === 'rejected') rejected++;
-                else if (status?.startsWith('fav-')) {
-                    favorites.push({
+                const rawItem = domainData[id];
+                const item = typeof rawItem === 'string' ? { status: rawItem } : rawItem;
+                if (!item || !item.status) continue;
+
+                if (item.status === 'seen') seen++;
+                else if (item.status === 'rejected') rejected++;
+                else if (item.status.startsWith('fav-')) {
+                    allFavorites.push({
                         id,
-                        domain,
-                        ...item,
-                        priority: status.split('-')[1].toUpperCase()
+                        domain: key,
+                        title: item.title || 'Untitled',
+                        url: item.url || '',
+                        timestamp: item.timestamp || 0,
+                        status: item.status,
+                        priority: item.status.split('-')[1].toUpperCase(),
+                        favoriteListId: item.favoriteListId || 'main',
+                        favoriteListName: item.favoriteListName || 'Main'
                     });
                 }
             }
         }
-        
-        currentFavorites = favorites;
+
+        for (const key in items) {
+            const parsed = StorageManager.parseFavoriteKey(key);
+            if (!parsed) continue;
+
+            const bucket = items[key] || {};
+            for (const id in bucket) {
+                const rawItem = bucket[id];
+                const item = typeof rawItem === 'string' ? { status: rawItem } : rawItem;
+                if (!item || !item.status || !item.status.startsWith('fav-')) continue;
+
+                allFavorites.push({
+                    id,
+                    domain: parsed.domain,
+                    title: item.title || 'Untitled',
+                    url: item.url || '',
+                    timestamp: item.timestamp || 0,
+                    status: item.status,
+                    priority: item.status.split('-')[1].toUpperCase(),
+                    favoriteListId: parsed.listId,
+                    favoriteListName: listById[parsed.listId] || item.favoriteListName || parsed.listId
+                });
+            }
+        }
+
+        const selectedFavorites = allFavorites.filter((fav) => fav.favoriteListId === activeListId);
+
+        currentFavorites = selectedFavorites;
 
         document.getElementById('stats-seen').textContent = seen;
         document.getElementById('stats-rejected').textContent = rejected;
-        document.getElementById('stats-favorites').textContent = favorites.length;
+        document.getElementById('stats-favorites').textContent = allFavorites.length;
 
-        renderFavorites(favorites);
+        renderFavorites(selectedFavorites);
     });
 }
 
@@ -72,7 +172,7 @@ function renderFavorites(favs) {
                 <a href="${f.url}" target="_blank" class="fav-title">${f.title}</a>
                 <span class="fav-p-badge fav-p-${f.priority.toLowerCase()}">${f.priority}</span>
             </div>
-            <div class="fav-meta">${f.domain}</div>
+            <div class="fav-meta">${f.domain} • ${f.favoriteListName}</div>
         </div>
     `).join('');
 }
@@ -147,6 +247,83 @@ function exportToMarkdown() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+}
+
+function exportBackup() {
+    chrome.storage.local.get(null, (items) => {
+        const payload = {
+            app: 'SeenIt',
+            formatVersion: BACKUP_FORMAT_VERSION,
+            exportedAt: new Date().toISOString(),
+            data: items
+        };
+
+        const json = JSON.stringify(payload, null, 2);
+        const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', `SeenIt_Backup_${new Date().toISOString().split('T')[0]}.json`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        showToast('Backup exported.');
+    });
+}
+
+async function importBackup(file) {
+    try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+
+        const backupData = normalizeBackupData(parsed);
+
+        if (!confirm('Import will replace your current SeenIt history and lists. Continue?')) {
+            return;
+        }
+
+        await new Promise((resolve) => {
+            chrome.storage.local.clear(resolve);
+        });
+
+        const keys = Object.keys(backupData);
+        if (keys.length > 0) {
+            await new Promise((resolve) => {
+                chrome.storage.local.set(backupData, resolve);
+            });
+        }
+
+        await setupFavoriteListControls();
+        await updateStats();
+        showToast('Backup imported successfully.');
+    } catch (error) {
+        console.error('SeenIt: backup import failed', error);
+        showToast('Import failed: invalid backup file.');
+    }
+}
+
+function normalizeBackupData(parsed) {
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        throw new Error('Backup root must be an object');
+    }
+
+    if (parsed.app === 'SeenIt') {
+        if (parsed.formatVersion !== BACKUP_FORMAT_VERSION) {
+            throw new Error('Unsupported backup version');
+        }
+
+        if (!parsed.data || typeof parsed.data !== 'object' || Array.isArray(parsed.data)) {
+            throw new Error('Backup data is invalid');
+        }
+
+        return parsed.data;
+    }
+
+    return parsed;
 }
 
 function showToast(message) {

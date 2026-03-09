@@ -52,12 +52,13 @@ class BaseProvider {
         logo.innerText = 'SeenIt';
         bar.appendChild(logo);
 
-        const currentStatus = status && typeof status === 'object' ? status.status : status;
+        const statusMeta = status && typeof status === 'object' ? status : null;
+        const currentStatus = statusMeta ? statusMeta.status : status;
 
         const statusContainer = document.createElement('div');
         statusContainer.className = 'seenit-expose-status';
         if (currentStatus) {
-            const badge = UIComponents.createBadge(currentStatus);
+            const badge = UIComponents.createBadge(currentStatus, statusMeta || {});
             badge.title = 'Нажмите, чтобы снять отметку';
             badge.style.cursor = 'pointer';
             badge.addEventListener('click', async () => {
@@ -162,22 +163,18 @@ class BaseProvider {
         const title = this.extractTitle(element) || 'Без названия';
         const url = this.extractUrl(element) || window.location.href;
 
-        const data = await StorageManager.getDomainData(this.domain);
-        data[id] = {
-            status: status,
+        return StorageManager.setItemStatus(this.domain, id, status, {
             title: title.trim(),
-            url: url,
+            url,
             timestamp: Date.now()
-        };
-        return new Promise((resolve) => {
-            chrome.storage.local.set({ [this.domain]: data }, resolve);
         });
     }
 
     async updateCardUI(card, id, status) {
         card.querySelectorAll('.seenit-ui-container').forEach(el => el.remove());
         
-        const currentStatus = status && typeof status === 'object' ? status.status : status;
+        const statusMeta = status && typeof status === 'object' ? status : null;
+        const currentStatus = statusMeta ? statusMeta.status : status;
         
         card.classList.remove('seenit-state-seen', 'seenit-state-rejected', 'seenit-state-fav');
         if (currentStatus) {
@@ -194,7 +191,7 @@ class BaseProvider {
         if (currentStatus) {
             const badgeWrapper = document.createElement('div');
             badgeWrapper.className = 'seenit-badge-wrapper';
-            const badge = UIComponents.createBadge(currentStatus);
+            const badge = UIComponents.createBadge(currentStatus, statusMeta || {});
             badge.style.cursor = 'pointer';
             badge.addEventListener('click', async () => {
                 await StorageManager.setItemStatus(this.domain, id, null);

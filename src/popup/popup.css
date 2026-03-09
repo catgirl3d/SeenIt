@@ -48,6 +48,24 @@ h2 {
     margin-bottom: 16px;
 }
 
+.favorite-list-controls {
+    margin-bottom: 16px;
+}
+
+.favorite-list-row {
+    display: flex;
+    gap: 8px;
+}
+
+.favorite-list-row .export-select {
+    flex: 1;
+}
+
+.favorite-list-row .btn-secondary {
+    padding: 10px 12px;
+    min-width: 64px;
+}
+
 .stat-row {
     display: flex;
     justify-content: space-between;
@@ -99,6 +117,16 @@ button {
     display: flex;
     gap: 8px;
     margin-bottom: 8px;
+}
+
+.backup-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.backup-group .btn-secondary {
+    flex: 1;
 }
 
 .export-select {

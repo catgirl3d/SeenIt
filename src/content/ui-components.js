@@ -59,7 +59,7 @@ class UIComponents {
         return btn;
     }
 
-    static createBadge(status) {
+    static createBadge(status, meta = {}) {
         const badge = document.createElement('div');
         const isFav = status.startsWith('fav-');
         const priority = isFav ? status.split('-')[1].toUpperCase() : '';
@@ -68,6 +68,9 @@ class UIComponents {
         
         if (isFav) {
             badge.innerHTML = `<span class="star">⭐</span> Favorite (${priority})`;
+            if (meta.favoriteListName) {
+                badge.title = `List: ${meta.favoriteListName}`;
+            }
         } else {
             badge.innerText = status === 'seen' ? 'Seen' : 'Rejected';
         }
